@@ -14,6 +14,7 @@ data_dir = "/work-ceph/lprasse/siegel/data/fine_tune"
 batch_size= 200
 device = torch.device("cuda:3")#"cuda:1" or "cpu"
 outname= "fine_tune_batchsize5_epoch200"
+# model achieves accuracy of 1.0 after 117 epochs
 model_name = "inception"
 # Number of classes in the dataset
 num_classes = 4
