@@ -66,7 +66,7 @@ print(len(filenames))   # 7790
 save_as_pickle(filenames, f"/work-ceph/lprasse/siegel/features/{outname}/filenames.pkl")
 
 ## LOAD Model
-model_ft = torch.load(f"/work/lprasse/Code/simple/Models/{outname}")   ## select which model to use ##
+model_ft = models.inception_v3(pretrained=use_pretrained)  ## select which model to use ##
 #print(model_ft)
 ## INCEPTION ONLY
 model_ft.AuxLogits.fc = nn.Identity()

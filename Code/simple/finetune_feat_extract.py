@@ -8,11 +8,12 @@ from torch.utils.data import DataLoader, Dataset
 import torchvision.models as models
 import pickle5 as pickle
 import numpy as np
+import torch.optim as optim
 
-data_dir = "/work-ceph/lprasse/siegel/data/siegel_gray_norm" 
+data_dir = "/work-ceph/lprasse/siegel/data/fine_tune" 
 batch_size= 200
 device = torch.device("cuda:3")#"cuda:1" or "cpu"
-outname= "fine_tune_batchsize10_epoch50_NR"
+outname= "fine_tune_batchsize5_epoch200"
 model_name = "inception"
 # Number of classes in the dataset
 num_classes = 4
@@ -22,7 +23,7 @@ batch_size = 5
 num_epochs = 200
 # Flag for feature extracting. When False, we finetune the whole model,
 #   when True we only update the reshaped layer params
-feature_extract = True
+feature_extract = False
 
 ## PREP
 def save_as_pickle(obj, filename):
@@ -49,20 +50,15 @@ def load_pickle(filename):
         return pickle.load(file)
 
 def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_inception=False):
-    since = time.time()
-
-    val_acc_history = []
-
-    best_acc = 0.0
-
+    model.train()  # Set model to training mode
     for epoch in range(num_epochs):
+        running_loss = 0.0
+        running_corrects = 0
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
         print('-' * 10)
-
-        model.train()  # Set model to training mode
-        
+       
         # Iterate over data.
-        for inputs, labels in dataloaders[phase]:
+        for inputs, labels in dataloaders:
             inputs = inputs.to(device)
             labels = labels.to(device)
 
@@ -70,82 +66,157 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
             optimizer.zero_grad()
 
             # forward
-            # track history if only in train
-            with torch.set_grad_enabled(phase == 'train'):
-                # Get model outputs and calculate loss
-                # Special case for inception because in training it has an auxiliary output. In train
-                #   mode we calculate the loss by summing the final output and the auxiliary output
-                #   but in testing we only consider the final output.
-                if is_inception and phase == 'train':
-                    # From https://discuss.pytorch.org/t/how-to-optimize-inception-model-with-auxiliary-classifiers/7958
-                    outputs, aux_outputs = model(inputs)
-                    loss1 = criterion(outputs, labels)
-                    loss2 = criterion(aux_outputs, labels)
-                    loss = loss1 + 0.4*loss2
-                else:
-                    outputs = model(inputs)
-                    loss = criterion(outputs, labels)
+            # Get model outputs and calculate loss
+            # Special case for inception because in training it has an auxiliary output. In train
+            #   mode we calculate the loss by summing the final output and the auxiliary output
+            #   but in testing we only consider the final output.
+            if is_inception:
+                # From https://discuss.pytorch.org/t/how-to-optimize-inception-model-with-auxiliary-classifiers/7958
+                outputs, aux_outputs = model(inputs)
+                loss1 = criterion(outputs, labels)
+                loss2 = criterion(aux_outputs, labels)
+                loss = loss1 + 0.4*loss2
+            else:
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
 
-                _, preds = torch.max(outputs, 1)
+            _, preds = torch.max(outputs, 1)
 
-                # backward + optimize only if in training phase
-                if phase == 'train':
-                    loss.backward()
-                    optimizer.step()
+            loss.backward()
+            optimizer.step()
 
-                # statistics
-                running_loss += loss.item() * inputs.size(0)
-                running_corrects += torch.sum(preds == labels.data)
-
-            epoch_loss = running_loss / len(dataloaders[phase].dataset)
-            epoch_acc = running_corrects.double() / len(dataloaders[phase].dataset)
-
-            print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
-
-        print()
-
-    time_elapsed = time.time() - since
-    print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-
+            # statistics
+            running_loss += loss.item() * inputs.size(0)
+            running_corrects += torch.sum(preds == labels.data)
+            
+        epoch_loss = running_loss / len(dataloaders.dataset)
+        epoch_acc = running_corrects.double() / len(dataloaders.dataset)
+        print(f"Loss: {epoch_loss}")
+        print(f"Accuracy: {epoch_acc}")
     return model
+
+def set_parameter_requires_grad(model, feature_extracting):
+    if feature_extracting:
+        for param in model.parameters():
+            param.requires_grad = False
+def initialize_model(model_name, num_classes, feature_extract, use_pretrained=True):
+    # Initialize these variables which will be set in this if statement. Each of these
+    #   variables is model specific.
+    model_ft = None
+    input_size = 0
+
+    if model_name == "resnet":
+        """ Resnet18
+        """
+        model_ft = models.resnet18(pretrained=use_pretrained)
+        set_parameter_requires_grad(model_ft, feature_extract)
+        num_ftrs = model_ft.fc.in_features
+        model_ft.fc = nn.Linear(num_ftrs, num_classes)
+        input_size = 224
+
+    elif model_name == "alexnet":
+        """ Alexnet
+        """
+        model_ft = models.alexnet(pretrained=use_pretrained)
+        set_parameter_requires_grad(model_ft, feature_extract)
+        num_ftrs = model_ft.classifier[6].in_features
+        model_ft.classifier[6] = nn.Linear(num_ftrs,num_classes)
+        input_size = 224
+
+    elif model_name == "vgg":
+        """ VGG11_bn
+        """
+        model_ft = models.vgg11_bn(pretrained=use_pretrained)
+        set_parameter_requires_grad(model_ft, feature_extract)
+        num_ftrs = model_ft.classifier[6].in_features
+        model_ft.classifier[6] = nn.Linear(num_ftrs,num_classes)
+        input_size = 224
+
+    elif model_name == "squeezenet":
+        """ Squeezenet
+        """
+        model_ft = models.squeezenet1_0(pretrained=use_pretrained)
+        set_parameter_requires_grad(model_ft, feature_extract)
+        model_ft.classifier[1] = nn.Conv2d(512, num_classes, kernel_size=(1,1), stride=(1,1))
+        model_ft.num_classes = num_classes
+        input_size = 224
+
+    elif model_name == "densenet":
+        """ Densenet
+        """
+        model_ft = models.densenet121(pretrained=use_pretrained)
+        set_parameter_requires_grad(model_ft, feature_extract)
+        num_ftrs = model_ft.classifier.in_features
+        model_ft.classifier = nn.Linear(num_ftrs, num_classes)
+        input_size = 224
+
+    elif model_name == "inception":
+        """ Inception v3
+        Be careful, expects (299,299) sized images and has auxiliary output
+        """
+        model_ft = models.inception_v3(pretrained=use_pretrained)
+        set_parameter_requires_grad(model_ft, feature_extract)
+        # Handle the auxilary net
+        num_ftrs = model_ft.AuxLogits.fc.in_features
+        model_ft.AuxLogits.fc = nn.Linear(num_ftrs, num_classes)
+        # Handle the primary net
+        num_ftrs = model_ft.fc.in_features
+        model_ft.fc = nn.Linear(num_ftrs,num_classes)
+        input_size = 299
+
+    return model_ft, input_size
+
+# Initialize the model for this run
+model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=True)
+
+# Print the model we just instantiated
+#print(model_ft)
+
+# Data augmentation and normalization for training
+# Just normalization for validation
+data_transforms = transforms.Compose([
+    transforms.Resize((input_size,input_size)),                    
+    #transforms.CenterCrop(224),                 
+    transforms.ToTensor()#,                    
+#     transforms.Normalize(                      
+#     mean = [0.485, 0.456, 0.406],
+#     std = [0.229, 0.224, 0.225]                  
+# )
+])
 
 ## Load dataset and create data loader
 image_dataset = datasets.ImageFolder(root=data_dir, transform=data_transforms)
 dataloader = torch.utils.data.DataLoader(image_dataset, batch_size=batch_size, shuffle=False, num_workers=25)
 print("data loaded")
 
-# Load filenames imagenet
-filenames = []
-for i in image_dataset.imgs:
-  name = i[0]
-  filenames.append(name)
-
-print(len(filenames))   # 7790
-save_as_pickle(filenames, f"/work-ceph/lprasse/siegel/features/{outname}/filenames.pkl")
-
-## LOAD Model
-model_ft = torch.load(f"/work/lprasse/Code/simple/Models/{outname}")   ## select which model to use ##
-#print(model_ft)
-## INCEPTION ONLY
-model_ft.AuxLogits.fc = nn.Identity()
-# Handle the primary net
-model_ft.fc = nn.Identity()
-#print(model_ft)
-## ALL MODELS
+# Send the model to GPU
 model_ft = model_ft.to(device)
-model_ft.eval()
 
-print(model_ft)
+# Gather the parameters to be optimized/updated in this run. If we are
+#  finetuning we will be updating all parameters. However, if we are
+#  doing feature extract method, we will only update the parameters
+#  that we have just initialized, i.e. the parameters with requires_grad
+#  is True.
+params_to_update = model_ft.parameters()
+print("Params to learn:")
+if feature_extract:
+    params_to_update = []
+    for name,param in model_ft.named_parameters():
+        if param.requires_grad == True:
+            params_to_update.append(param)
+            print("\t",name)
+else:
+    for name,param in model_ft.named_parameters():
+        if param.requires_grad == True:
+            print("\t",name)
 
-print("start feature extraction")
-#Generate features and save them
+# Observe that all parameters are being optimized
+optimizer_ft = optim.SGD(params_to_update, lr=0.001, momentum=0.9)
 
-with torch.no_grad():
-    i_batch=0
-    for _, sample_batched in enumerate(dataloader):
-      data = sample_batched[0]
-      data = data.to(device)
-      feature=model_ft(data)
-      save_as_pickle(feature, f"/work-ceph/lprasse/siegel/features/{outname}/train_{i_batch}.pkl")
-      print(i_batch)
-      i_batch+=1
+# Setup the loss fxn
+criterion = nn.CrossEntropyLoss()
+
+# Train and evaluate
+model_ft = train_model(model_ft, dataloader, criterion, optimizer_ft, num_epochs=num_epochs, is_inception=(model_name=="inception"))
+
+torch.save(model_ft, f"/work-ceph/lprasse/siegel/models/{outname}" )

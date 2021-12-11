@@ -12,7 +12,7 @@ import numpy as np
 data_dir = "/work-ceph/lprasse/siegel/data/siegel_gray_norm" 
 batch_size= 200
 device = torch.device("cuda:3")#"cuda:1" or "cpu"
-outname= "fine_tune_batchsize10_epoch50_NR"
+outname= "fine_tune_batchsize10_epoch50_NR" # is also model name
 
 ## PREP
 def save_as_pickle(obj, filename):
