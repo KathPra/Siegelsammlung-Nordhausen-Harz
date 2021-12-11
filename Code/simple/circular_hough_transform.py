@@ -5,7 +5,6 @@ image_folder="/work-ceph/lprasse/siegel/data/train/samples/"
 ### Parameters that may be altered: prep_image(resize_factor),image_gradients(sigma, high_threshold, low_threshold),
 ### hough_trans(min_radius, max_radius, total_num_peaks, threshold), alter_img(buffer)
 
-
 ### Python packages used
 import numpy as np
 from PIL import Image, ImageDraw
