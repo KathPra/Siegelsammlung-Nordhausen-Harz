@@ -12,8 +12,8 @@ import torch.optim as optim
 
 data_dir = "/work-ceph/lprasse/siegel/data/fine_tune" 
 batch_size= 200
-device = torch.device("cuda:3")#"cuda:1" or "cpu"
-outname= "fine_tune_batchsize5_epoch200"
+device = torch.device("cuda:0")#"cuda:1" or "cpu"
+outname= "fine_tune_batchsize5_epoch200_Rotated"
 # model achieves accuracy of 1.0 after 117 epochs
 model_name = "inception"
 # Number of classes in the dataset
@@ -175,8 +175,10 @@ model_ft, input_size = initialize_model(model_name, num_classes, feature_extract
 
 # Data augmentation and normalization for training
 # Just normalization for validation
+torch.manual_seed(17)
 data_transforms = transforms.Compose([
-    transforms.Resize((input_size,input_size)),                    
+    transforms.Resize((input_size,input_size)), 
+    transforms.RandomRotation((0,360)),                   
     #transforms.CenterCrop(224),                 
     transforms.ToTensor()#,                    
 #     transforms.Normalize(                      
