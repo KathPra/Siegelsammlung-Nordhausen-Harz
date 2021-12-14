@@ -1,5 +1,7 @@
 ### USER INPUT: complete path to image folder
+# Attention: Outpath must exist already, it cannot be created by this code!
 image_folder="/work-ceph/lprasse/siegel/data/train/samples/"
+out_path="/work-ceph/lprasse/siegel/data/"
 
 ### NO USER INPUT REQUIRED
 ### Parameters that may be altered: prep_image(resize_factor),image_gradients(sigma, high_threshold, low_threshold),
@@ -107,19 +109,19 @@ def save_imgs(img, file_name):
     high resolution (original size), low resolution (input size required by neural net),
     low resolution and gray scale, low resolution with gray scale and improved contrast, low resolution and edges
     """
-    img.save(f'/work-ceph/lprasse/siegel/data/siegel_hq/samples/{file_name}')
+    img.save(os.path.join(outpath, "siegel_hq/samples/", file_name)
     img1 = img.resize((299,299))
-    img1.save(f'/work-ceph/lprasse/siegel/data/siegel_lq/samples/{file_name}')
+    img1.save((os.path.join(outpath, "siegel_lq/samples/", file_name)
     img2 = img.convert('L')
-    img2.save(f'/work-ceph/lprasse/siegel/data/siegel_gray/samples/{file_name}')
+    img2.save((os.path.join(outpath, "siegel_gray/samples/", file_name)
     img3 = np.asarray(img2)
     img_adapteq = exposure.equalize_adapthist(img3, clip_limit=0.03)
     out = img_as_ubyte(img_adapteq)
     out1 = Image.fromarray(out.astype(np.uint8), mode='L')
-    out1.save(f'/work-ceph/lprasse/siegel/data/siegel_gray_norm/samples/{file_name}')
+    out1.save((os.path.join(outpath, "siegel_gray_norm/samples/", file_name)
     edges = canny(out, sigma=1.5, low_threshold=10, high_threshold=50)
     edges = Image.fromarray(edges).convert("RGB")
-    edges.save(f'/work-ceph/lprasse/siegel/data/siegel_edges/samples/{file_name}')
+    edges.save((os.path.join(outpath, "siegel_edges/samples/", file_name)
 
 ### Function call
 counter = 0

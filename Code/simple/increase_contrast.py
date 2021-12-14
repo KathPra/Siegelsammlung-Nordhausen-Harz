@@ -1,6 +1,6 @@
 ### USER INPUT: complete path to image folder
 image_folder="/work-ceph/lprasse/siegel/data/train/samples/"
-out_path="/work-ceph/lprasse/siegel/data/test/increase contrast"
+out_path="/work-ceph/lprasse/siegel/data/test/increase_contrast/"
 
 ### NO USER INPUT REQUIRED
 ### Parameters that may be altered: save_imgs(clip_limit)
@@ -31,7 +31,9 @@ def save_imgs(img, file_name):
     img_adapteq = exposure.equalize_adapthist(img, clip_limit=0.03)
     out = img_as_ubyte(img_adapteq)
     out1 = Image.fromarray(out.astype(np.uint8))
-    out1.save(os.path.join(out_path, file_name))
+    path_saved = os.path.join(out_path, file_name)
+    print(path_saved)
+    out1.save(path_saved)
 
 ### Function call
 counter = 0
