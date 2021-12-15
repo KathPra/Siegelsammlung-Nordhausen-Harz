@@ -51,21 +51,34 @@ def hough_trans(edges, img_out):
     max_radius = 13
     hough_radii = np.arange(min_radius,max_radius,1) # 6,18,1
     hough_res = hough_circle(edges, hough_radii) # extract all possible circle centers for all specified radii
-    accums, cx, cy, radii = hough_circle_peaks(hough_res, hough_radii, total_num_peaks=5)
+    accums, cx, cy, radii = hough_circle_peaks(hough_res, hough_radii, total_num_peaks=10)
     h,w = img_out.shape # height, width
     for i in range(len(cy)):
         y_max = cy[i] + radii[i]
         y_min = cy[i] - radii[i]
-        print(y_min)
         x_max = cx[i] + radii[i]
         x_min = cx[i] - radii[i]
         threshold = 10
-        if y_min < threshold or y_max > (h-threshold) or x_max > (w-threshold) or x_min < threshold:
-            continue
-        cy =cy[i]
-        cx = cx[i]
-        radii= radii[i]
-        break
+        print(i)
+        if i < len(cy):
+            if y_min > threshold and y_max < (h-threshold) and x_max < (w-threshold) and x_min > threshold:
+                cy =cy[i]
+                print(cy)
+                print(type(cy))
+                cx = cx[i]
+                radii= radii[i]
+                break
+        else: 
+            if y_min > threshold and y_max < (h-threshold) and x_max < (w-threshold) and x_min > threshold:
+                cy = cy[i]
+                cx = cx[i]
+                radii = radii[i]
+            else:
+                cy =cy[0]
+                print(cy)
+                print(type(cy))
+                cx = cx[0]
+                radii= radii[0]   
     return cy,cx,radii
 
 def alter_img(cy, cx, radius):
@@ -82,7 +95,7 @@ def alter_img(cy, cx, radius):
     # Create same size alpha layer with circle approximation by 20 corner polygon
     alpha = Image.new('L',(w,h),0)
     draw = ImageDraw.Draw(alpha)
-    buffer = 1.2
+    buffer = int(1.2)
     center_y = int(cy *150)
     center_x = int(cx *150)
     radius = int(radius *150*buffer)
@@ -109,19 +122,19 @@ def save_imgs(img, file_name):
     high resolution (original size), low resolution (input size required by neural net),
     low resolution and gray scale, low resolution with gray scale and improved contrast, low resolution and edges
     """
-    img.save(os.path.join(outpath, "siegel_hq/samples/", file_name)
+    img.save(os.path.join(out_path, "siegel_hq/samples/", file_name))
     img1 = img.resize((299,299))
-    img1.save((os.path.join(outpath, "siegel_lq/samples/", file_name)
+    img1.save(os.path.join(out_path, "siegel_lq/samples/", file_name))
     img2 = img.convert('L')
-    img2.save((os.path.join(outpath, "siegel_gray/samples/", file_name)
+    img2.save(os.path.join(out_path, "siegel_gray/samples/", file_name))
     img3 = np.asarray(img2)
     img_adapteq = exposure.equalize_adapthist(img3, clip_limit=0.03)
     out = img_as_ubyte(img_adapteq)
     out1 = Image.fromarray(out.astype(np.uint8), mode='L')
-    out1.save((os.path.join(outpath, "siegel_gray_norm/samples/", file_name)
+    out1.save(os.path.join(out_path, "siegel_gray_norm/samples/", file_name))
     edges = canny(out, sigma=1.5, low_threshold=10, high_threshold=50)
     edges = Image.fromarray(edges).convert("RGB")
-    edges.save((os.path.join(outpath, "siegel_edges/samples/", file_name)
+    edges.save(os.path.join(out_path, "siegel_edges/samples/", file_name))
 
 ### Function call
 counter = 0
