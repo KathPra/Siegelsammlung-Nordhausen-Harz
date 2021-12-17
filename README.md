@@ -10,4 +10,4 @@ The repository contains 3 Folders:
   Required packages: python 3.9.7, scikit-image 0.18.3, scikit-learn 1.0.1, scipy 1.7.1, numpy 1.19.2, pillow 8.3.1, matplotlib 3.3.4,   
 </ol>
 
-<For more details please refer to the documentation.
+For more details please refer to the documentation.
