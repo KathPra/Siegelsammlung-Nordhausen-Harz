@@ -11,8 +11,8 @@ import numpy as np
 
 data_dir = "/work-ceph/lprasse/siegel/data/siegel_gray_norm" 
 batch_size= 200
-device = torch.device("cuda:3")#"cuda:1" or "cpu"
-outname= "fine_tune_batchsize10_epoch50_NR" # is also model name
+device = torch.device("cuda:1")#"cuda:1" or "cpu"
+outname= "fine_tune_batchsize5_epoch200_Rotated" # is also model name
 
 ## PREP
 def save_as_pickle(obj, filename):
@@ -66,7 +66,7 @@ print(len(filenames))   # 7790
 save_as_pickle(filenames, f"/work-ceph/lprasse/siegel/features/{outname}/filenames.pkl")
 
 ## LOAD Model
-model_ft = torch.load(f"/work/lprasse/Code/simple/Models/{outname}")   ## select which model to use ##
+model_ft = torch.load(f"/work-ceph/lprasse/siegel/models/{outname}")   ## select which model to use ##
 #print(model_ft)
 ## INCEPTION ONLY
 model_ft.AuxLogits.fc = nn.Identity()
@@ -77,7 +77,7 @@ model_ft.fc = nn.Identity()
 model_ft = model_ft.to(device)
 model_ft.eval()
 
-print(model_ft)
+#print(model_ft)
 
 print("start feature extraction")
 #Generate features and save them
