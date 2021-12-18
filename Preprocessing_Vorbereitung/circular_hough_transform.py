@@ -120,7 +120,7 @@ def save_imgs(img, file_name):
     img.save(os.path.join(out_path, "siegel_hq/samples/", file_name))
     img1 = img.resize((299,299))
     img1.save(os.path.join(out_path, "siegel_lq/samples/", file_name))
-    img2 = img.convert('L')
+    img2 = img1.convert('L')
     img2.save(os.path.join(out_path, "siegel_gray/samples/", file_name))
     img3 = np.asarray(img2)
     img_adapteq = exposure.equalize_adapthist(img3, clip_limit=0.03)
