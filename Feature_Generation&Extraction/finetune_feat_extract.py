@@ -7,7 +7,7 @@ out_path = "/work-ceph/lprasse/siegel/models/"
 
 ### NO USER INPUT REQUIRED
 ### Parameters that may be altered: batch_size (change according to memory availability), CUDA/GPU (change according to availability),
-### model_name, num_classes, feat_extract, use_pretrained (True/False), num_workers
+### model_name, num_classes, feat_extract, use_pretrained (True/False), num_workers, num_epochs
 
 ### CREDIT for code fragments: https://pytorch.org/vision/stable/models.html
 
