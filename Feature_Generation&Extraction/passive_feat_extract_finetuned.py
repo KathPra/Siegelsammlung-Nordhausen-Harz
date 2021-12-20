@@ -4,6 +4,7 @@ data_dir = "/work-ceph/lprasse/siegel/data/siegel_gray_norm"
 outname= "fine_tune_batchsize5_epoch150_Rotated"                # is also model name
 out_path = "/work-ceph/lprasse/siegel/features/"
 model_path = "/work-ceph/lprasse/siegel/models/"
+model_name = "densenet" ## select from inception, vgg, resnet, alexnet, squeezenet, densenet
 
 ### NO USER INPUT REQUIRED
 ### Parameters that may be altered: batch_size (change according to memory availability), CUDA/GPU (change according to availability),
@@ -25,7 +26,6 @@ import numpy as np
 ### Model settings
 batch_size= 200
 device = torch.device("cuda:1")#"cuda:1" or "cpu"
-model_name = "densenet" ## select from inception, vgg, resnet, alexnet, squeezenet, densenet
 
 ### Functions defined
 def save_as_pickle(obj, filename):
