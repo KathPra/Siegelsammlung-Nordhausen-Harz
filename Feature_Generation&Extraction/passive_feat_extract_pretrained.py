@@ -8,13 +8,14 @@ out_path = "/work-ceph/lprasse/siegel/features/"
 ### Parameters that may be altered: batch_size (change according to memory availability), device(cpu/gpu) (change according to availability),
 ### model_name, use_pretrained (True/False), num_workers
 
+### CREDIT for code fragments: https://pytorch.org/vision/stable/models.html
+
 ### Python packages used
 import torch
 import torch.nn as nn
 import torchvision
 from torchvision import datasets, transforms
 import os
-import os.path
 from torch.utils.data import DataLoader, Dataset
 import torchvision.models as models
 import pickle5 as pickle
@@ -53,7 +54,7 @@ def load_pickle(filename):
 def initialize_model(model_name, use_pretrained=True):
     """
     Initialize the model specified in variable model_name, adjust the classification head to the output classes specified
-    in num_classes, and selects the parameter to be updated specified using feat_extract.
+    in num_classes, and selects the correct input size for each model.
     """
     model_ft = None
     input_size = 0
