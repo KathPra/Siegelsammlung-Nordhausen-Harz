@@ -8,7 +8,7 @@ isinception = False
 
 ### NO USER INPUT REQUIRED
 ### Parameters that may be altered: batch_size (change according to memory availability), CUDA/GPU (change according to availability),
-### model_name (must be same as the model loaded), num_workers, input_size (must match the model loaded)
+### num_workers, input_size (must match the model loaded)
 
 ### Python packages used
 import torch
