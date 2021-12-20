@@ -5,7 +5,7 @@ outname= "pretrained"                # is also model name
 out_path = "/work-ceph/lprasse/siegel/features/"
 
 ### NO USER INPUT REQUIRED
-### Parameters that may be altered: batch_size (change according to memory availability), CUDA/GPU (change according to availability),
+### Parameters that may be altered: batch_size (change according to memory availability), device(cpu/gpu) (change according to availability),
 ### model_name, num_workers, input_size (must match the model loaded), use_pretrained (True/False)
 
 ### Python packages used
