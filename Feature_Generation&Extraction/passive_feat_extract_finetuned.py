@@ -8,7 +8,7 @@ model_name = "densenet" ## select from inception, vgg, resnet, alexnet, squeezen
 
 ### NO USER INPUT REQUIRED
 ### Parameters that may be altered: batch_size (change according to memory availability), CUDA/GPU (change according to availability),
-### num_workers, model_name (of model loaded)
+### num_workers
 
 ### CREDIT for code fragments: https://pytorch.org/vision/stable/models.html
 
