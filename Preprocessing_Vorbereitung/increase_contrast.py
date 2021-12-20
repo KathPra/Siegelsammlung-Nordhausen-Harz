@@ -7,12 +7,9 @@ out_path="/work-ceph/lprasse/siegel/data/test/increase_contrast/"
 
 ### Python packages used
 import numpy as np
-from PIL import Image#, ImageDraw
+from PIL import Image
 from skimage import exposure
-#from skimage import data, color, filters
 from skimage.util import img_as_ubyte
-#from skimage.feature import canny
-#from scipy import ndimage
 import os
 
 ### Functions defined
