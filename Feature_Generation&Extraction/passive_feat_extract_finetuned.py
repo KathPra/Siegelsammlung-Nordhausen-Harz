@@ -4,6 +4,7 @@ data_dir = "/work-ceph/lprasse/siegel/data/siegel_gray_norm"
 outname= "fine_tune_batchsize5_epoch150_Rotated"                # is also model name
 out_path = "/work-ceph/lprasse/siegel/features/"
 model_path = "/work-ceph/lprasse/siegel/models/"
+isinception = False
 
 ### NO USER INPUT REQUIRED
 ### Parameters that may be altered: batch_size (change according to memory availability), CUDA/GPU (change according to availability),
@@ -74,10 +75,15 @@ save_as_pickle(filenames, os.path.join(out_path, outname, "filenames.pkl"))
 
 ## Load model
 model_ft = torch.load(os.path.join(model_path, outname))   ## select which model to use ##
-#print(model_ft) # display model with all parameters
+
 ## Remove the classification header to have the extracted features, not a prediction
-model_ft.AuxLogits.fc = nn.Identity()   # auxilary net
-model_ft.fc = nn.Identity()             # primary net
+if isinception:
+    model_ft.AuxLogits.fc = nn.Identity()                    # auxilary net
+    model_ft.fc = nn.Identity()                              # primary net
+else:
+    model_ft.classifier = nn.Identity()  
+
+#print(model_ft) # display model with all parameters
 
 # Prepare model for evaluation
 model_ft = model_ft.to(device)
