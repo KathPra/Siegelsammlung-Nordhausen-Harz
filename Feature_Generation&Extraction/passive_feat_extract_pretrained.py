@@ -23,6 +23,8 @@ import numpy as np
 ### Model settings
 batch_size= 200
 device = torch.device("cuda:3")#"cuda:1" or "cpu"
+model_name = "densenet" ## select from inception, vgg, resnet, alexnet, squeezenet, densenet
+use_pretrained = True
 
 ### Functions defined
 def save_as_pickle(obj, filename):
@@ -48,10 +50,69 @@ def load_pickle(filename):
     with open(filename, 'rb') as file:
         return pickle.load(file)
 
-### Function calls
-## Load data - adjust to model
-input_size = 299                                       # required for inception net
+def initialize_model(model_name, use_pretrained=True):
+    """
+    Initialize the model specified in variable model_name, adjust the classification head to the output classes specified
+    in num_classes, and selects the parameter to be updated specified using feat_extract.
+    """
+    model_ft = None
+    input_size = 0
 
+    if model_name == "resnet":
+        """ Resnet18
+        """
+        model_ft = models.resnet18(pretrained=use_pretrained)
+        model_ft.fc =  nn.Identity()   
+        input_size = 224
+
+    elif model_name == "alexnet":
+        """ Alexnet
+        """
+        model_ft = models.alexnet(pretrained=use_pretrained)
+        model_ft.classifier[6] =  nn.Identity()   
+        input_size = 224
+
+    elif model_name == "vgg":
+        """ VGG11_bn
+        """
+        model_ft = models.vgg11_bn(pretrained=use_pretrained)
+        model_ft.classifier[6] =  nn.Identity()   
+        input_size = 224
+
+    elif model_name == "squeezenet":
+        """ Squeezenet
+        """
+        model_ft = models.squeezenet1_0(pretrained=use_pretrained)
+        model_ft.classifier[1] =  nn.Identity()   
+        model_ft.num_classes = num_classes
+        input_size = 224
+
+    elif model_name == "densenet":
+        """ Densenet
+        """
+        model_ft = models.densenet121(pretrained=use_pretrained)
+        model_ft.classifier =  nn.Identity()   
+        input_size = 224
+
+    elif model_name == "inception":
+        """ Inception v3
+        Be careful, expects (299,299) sized images and has auxiliary output
+        """
+        model_ft = models.inception_v3(pretrained=use_pretrained)
+        # Handle the auxilary net
+        model_ft.AuxLogits.fc =  nn.Identity()   
+        # Handle the primary net
+        model_ft.fc =  nn.Identity()   
+        input_size = 299
+
+    return model_ft, input_size
+    
+### Function calls
+
+# Initialize model and load weights
+model_ft, input_size = initialize_model(model_name, use_pretrained=use_pretrained)
+
+# Transformation of data
 data_transforms = transforms.Compose([
     transforms.Resize((input_size,input_size)),                                 
     transforms.ToTensor()
