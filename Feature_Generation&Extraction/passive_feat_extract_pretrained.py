@@ -3,7 +3,6 @@
 data_dir = "/work-ceph/lprasse/siegel/data/siegel_gray_norm"
 outname= "pretrained"                # is also model name
 out_path = "/work-ceph/lprasse/siegel/features/"
-model_path = "/work-ceph/lprasse/siegel/models/"
 
 ### NO USER INPUT REQUIRED
 ### Parameters that may be altered: batch_size (change according to memory availability), CUDA/GPU (change according to availability),
