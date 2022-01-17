@@ -7,8 +7,8 @@ This project was in cooperation with:
 Funded by:
 Beauftragte der Bundesregierung für Kultur und Medien
 
-This repository contains all code written &amp; used in the context of the project Siegelsammlung Nordhausen/Harz. All code is written is python, the installed packages differ per folder.
-The repository contains 3 Folders:
+This repository contains all code written &amp; used in the context of the project Siegelsammlung Nordhausen/Harz. All code is written is python, the installed packages differ per sub-task. For each sub-task, a seperate folder was created.
+The repository contains 3 folders:
 <ol>
   <li>Preprocessing_Vorbereitung</li>
   Required packages: python 3.9.0, scikit-image 0.18.3, scipy 1.6.2, numpy 1.19.2, pillow 8.4.0 
