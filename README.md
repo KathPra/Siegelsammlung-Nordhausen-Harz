@@ -1,5 +1,13 @@
 # Siegelsammlung-Nordhausen-Harz
-This repository contains all code written &amp; used in the context of the project Siegelsammlung Nordhausen/Harz. All code is written is python, the installed packages differ per folder.
+This project was in cooperation with:
+- Stadtarchiv Nordhausen
+- Universität Mannheim
+- Universitätsarchiv Leipzig
+
+Funded by:
+Beauftragte der Bundesregierung für Kultur und Medien
+
+This repository contains all code written &amp used in the context of the project Siegelsammlung Nordhausen/Harz. All code is written is python, the installed packages differ per folder.
 The repository contains 3 Folders:
 <ol>
   <li>Preprocessing_Vorbereitung</li>
