@@ -1,11 +1,11 @@
 # Siegelsammlung-Nordhausen-Harz
-This project was in cooperation with:
+This project was completed in cooperation with:
 - Stadtarchiv Nordhausen
-- Universität Mannheim
+- Universität Mannheim (Prof. Margret Keuper)
 - Universitätsarchiv Leipzig
 
 Funded by:
-Beauftragte der Bundesregierung für Kultur und Medien
+Beauftragte der Bundesregierung für Kultur und Medien (Neustart Kultur / Wissenswandel)
 
 This repository contains all code written &amp; used in the context of the project Siegelsammlung Nordhausen/Harz. All code is written is python, the installed packages differ per sub-task. For each sub-task, a seperate folder was created.
 The repository contains 3 folders:
