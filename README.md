@@ -1,7 +1,7 @@
 # Siegelsammlung-Nordhausen-Harz
 This project was completed in cooperation with:
 - Stadtarchiv Nordhausen
-- Universität Mannheim (Prof. Margret Keuper)
+- Universität Mannheim (Prof. Margret Keuper (Universität Siegen since August 2021), Prof. Hiram Kümper)
 - Universitätsarchiv Leipzig
 
 Funded by:
@@ -19,3 +19,5 @@ The repository contains 3 folders:
 </ol>
 
 For more details please refer to the documentation.
+
+Many thanks to Prof. Keuper and Prof. Kümper for their continuous support. Without them, this project would have not been possible.
